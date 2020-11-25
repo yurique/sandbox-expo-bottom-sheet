@@ -1,14 +1,26 @@
-import React, { useRef } from 'react';
+import React, {useRef, useState} from 'react';
 import {
   StyleSheet,
   Text,
   View,
   Image,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback, ScrollView, Dimensions
 } from 'react-native';
 import BottomSheet from 'reanimated-bottom-sheet';
+import MapView, {Marker} from 'react-native-maps'
+
+const {width, height} = Dimensions.get('window');
+
+const ASPECT_RATIO = width / height;
+const LATITUDE = 37.78825;
+const LONGITUDE = -122.4324;
+const LATITUDE_DELTA = 0.0922;
+const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 const styles = StyleSheet.create({
+  scrollview: {
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
     backgroundColor: '#F5FCFF',
@@ -29,7 +41,6 @@ const styles = StyleSheet.create({
   },
   panel: {
     height: 600,
-    padding: 20,
     backgroundColor: '#f7f5eee8',
   },
   header: {
@@ -53,19 +64,36 @@ const styles = StyleSheet.create({
     fontSize: 27,
     height: 35,
   },
-  map: {
-    height: '100%',
-    width: '100%',
-  },
 })
-
 
 export default function App() {
   const sheetRef = useRef(null);
+  const [region, setRegion] = useState({
+    latitude: LATITUDE,
+    longitude: LONGITUDE,
+    latitudeDelta: LATITUDE_DELTA,
+    longitudeDelta: LONGITUDE_DELTA,
+  })
 
   const renderContent = () => (
       <View style={styles.panel}>
-        <Image style={styles.map} source={require('./assets/map-bg.jpg')}/>
+        <View style={styles.container}>
+          <MapView
+              provider='google'
+              style={StyleSheet.absoluteFill}
+              scrollEnabled={true}
+              zoomEnabled={true}
+              pitchEnabled={true}
+              rotateEnabled={true}
+              initialRegion={region}
+          >
+            <Marker
+                title="This is a title"
+                description="This is a description"
+                coordinate={region}
+            />
+          </MapView>
+        </View>
       </View>
   );
 
